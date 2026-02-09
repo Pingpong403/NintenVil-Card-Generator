@@ -1,4 +1,4 @@
-using ToonVil_Card_Generator.CardGeneration;
+﻿using ToonVil_Card_Generator.CardGeneration;
 using static ToonVil_Card_Generator.CardGeneration.PrepareText;
 using static ToonVil_Card_Generator.CardGeneration.PrepareImage;
 using System.Drawing;
