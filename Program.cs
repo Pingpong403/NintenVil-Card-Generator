@@ -1,16 +1,16 @@
-﻿using ToonVil_Card_Generator.CardGeneration;
-using static ToonVil_Card_Generator.CardGeneration.PrepareText;
-using static ToonVil_Card_Generator.CardGeneration.PrepareImage;
+﻿using NintenVil_Card_Generator.CardGeneration;
+using static NintenVil_Card_Generator.CardGeneration.PrepareText;
+using static NintenVil_Card_Generator.CardGeneration.PrepareImage;
 using System.Drawing;
 using System.Reflection;
 
-namespace ToonVil_Card_Generator;
+namespace NintenVil_Card_Generator;
 
 class Program
 {
     static void Main(string[] args)
     {
-        Console.WriteLine("ToonVil Card Generator");
+        Console.WriteLine("NintenVil Card Generator");
 
         if (!MiscHelper.CheckStructure())
         {

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace ToonVil_Card_Generator.CardGeneration
+namespace NintenVil_Card_Generator.CardGeneration
 {
 	public static class ConfigHelper
 	{

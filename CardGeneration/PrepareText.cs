@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 using System.Diagnostics;
 using System.Data.SqlTypes;
 
-namespace ToonVil_Card_Generator.CardGeneration
+namespace NintenVil_Card_Generator.CardGeneration
 {
 	public static class PrepareText
 	{
@@ -345,9 +345,6 @@ namespace ToonVil_Card_Generator.CardGeneration
 		/// <param name="keywordsAndColors">a dictionary containing all the possible keywords and their colors</param>
 		public static void DrawType(string text, Font font, Color textColor, int maxWidth, int maxHeight, Dictionary<string, string> keywordsAndColors)
 		{
-			// For types, capitalize the text
-			text = text.ToUpper();
-
 			// Set the stringformat flags for center alignment and no trimming
 			StringFormat sf = StringFormat.GenericTypographic;
 			sf.Trimming = StringTrimming.None;
@@ -384,7 +381,7 @@ namespace ToonVil_Card_Generator.CardGeneration
 			}
 
 			// Get all the words
-			List<CardWord> words = GetCardWords(text, textBrush, font, keywordsAndColors, true);
+			List<CardWord> words = GetCardWords(text, textBrush, font, keywordsAndColors);
 
 			// Set up variables
 			float startY = (maxHeight - textHeight) / 2;
@@ -496,9 +493,8 @@ namespace ToonVil_Card_Generator.CardGeneration
 		/// <param name="defaultBrush">default text brush</param>
 		/// <param name="defaultFont">default text font</param>
 		/// <param name="keywordData">a dictionary of keywords and their associated colors</param>
-		/// <param name="isType">whether or not this is the type element</param>
 		/// <returns>a list of all words as CardWord objects</returns>
-		public static List<CardWord> GetCardWords(string text, Brush defaultBrush, Font defaultFont, Dictionary<string, string>? keywordData, bool isType = false)
+		public static List<CardWord> GetCardWords(string text, Brush defaultBrush, Font defaultFont, Dictionary<string, string>? keywordData)
 		{
 			char italicSymbol = Convert.ToChar(ConfigHelper.GetConfigValue("text", "italicCharacter"));
 			char escapeSymbol = Convert.ToChar(ConfigHelper.GetConfigValue("text", "escapeCharacter"));
@@ -516,22 +512,20 @@ namespace ToonVil_Card_Generator.CardGeneration
 			string builtWord = "";
 			foreach (char letter in text)
 			{
-				if (letter == ' ' || (isType && letter == '/'))
+				if (letter == ' ')
 				{
 					// End of word
 					if (builtWord != "")
 					{
-						bool isKeyword = keywordData != null && keywordData.TryGetValue(isType ? MiscHelper.Capitalize(builtWord.ToLower()) : builtWord, out string? value);
+						bool isKeyword = keywordData != null && keywordData.TryGetValue(builtWord, out string? value);
 						CardWord word = new(
 							builtWord,
-							isKeyword && !ignoreFormatting ? new SolidBrush(Color.FromArgb(Convert.ToInt32("ff" + keywordData[isType ? MiscHelper.Capitalize(builtWord.ToLower()) : builtWord], 16))) : defaultBrush,
+							isKeyword && !ignoreFormatting ? new SolidBrush(Color.FromArgb(Convert.ToInt32("ff" + keywordData[builtWord], 16))) : defaultBrush,
 							isKeyword && !ignoreFormatting ? (italicsOpen ? boldItalicFont : boldFont) : italicsOpen ? italicFont : defaultFont
 						);
-						word.SetType(isType);
 						cardWords.Add(word);
 					}
-					if (!isType) cardWords.Add(new CardWord(" ", defaultBrush, defaultFont));
-					else if (letter == '/') cardWords.Add(new CardWord("/", defaultBrush, defaultFont));
+					cardWords.Add(new CardWord(" ", defaultBrush, defaultFont));
 					builtWord = "";
 					ignoreFormatting = false;
 				}
@@ -561,10 +555,10 @@ namespace ToonVil_Card_Generator.CardGeneration
 						italicsOpen = !italicsOpen;
 						if (builtWord != "")
 						{
-							bool isKeyword = keywordData != null && keywordData.TryGetValue(isType ? MiscHelper.Capitalize(builtWord.ToLower()) : builtWord, out string? value);
+							bool isKeyword = keywordData != null && keywordData.TryGetValue(builtWord, out string? value);
 							CardWord word = new(
 								builtWord,
-								isKeyword && !ignoreFormatting ? new SolidBrush(Color.FromArgb(Convert.ToInt32("ff" + keywordData[isType ? MiscHelper.Capitalize(builtWord.ToLower()) : builtWord], 16))) : defaultBrush,
+								isKeyword && !ignoreFormatting ? new SolidBrush(Color.FromArgb(Convert.ToInt32("ff" + keywordData[builtWord], 16))) : defaultBrush,
 								isKeyword && !ignoreFormatting ? (!italicsOpen ? boldItalicFont : boldFont) : !italicsOpen ? italicFont : defaultFont
 							);
 							cardWords.Add(word);
@@ -579,10 +573,10 @@ namespace ToonVil_Card_Generator.CardGeneration
 					{
 						if (builtWord != "")
 						{
-							bool isKeyword = keywordData != null && keywordData.TryGetValue(isType ? MiscHelper.Capitalize(builtWord.ToLower()) : builtWord, out string? value);
+							bool isKeyword = keywordData != null && keywordData.TryGetValue(builtWord, out string? value);
 							CardWord word = new(
 								builtWord,
-								isKeyword && !ignoreFormatting ? new SolidBrush(Color.FromArgb(Convert.ToInt32("ff" + keywordData[isType ? MiscHelper.Capitalize(builtWord.ToLower()) : builtWord], 16))) : defaultBrush,
+								isKeyword && !ignoreFormatting ? new SolidBrush(Color.FromArgb(Convert.ToInt32("ff" + keywordData[builtWord], 16))) : defaultBrush,
 								isKeyword && !ignoreFormatting ? (italicsOpen ? boldItalicFont : boldFont) : italicsOpen ? italicFont : defaultFont
 							);
 							cardWords.Add(word);
@@ -595,10 +589,10 @@ namespace ToonVil_Card_Generator.CardGeneration
 					{
 						if (MiscHelper.IsPunctuation(Convert.ToString(letter)) && builtWord != "")
 						{
-							bool isKeyword = keywordData != null && keywordData.TryGetValue(isType ? MiscHelper.Capitalize(builtWord.ToLower()) : builtWord, out string? value);
+							bool isKeyword = keywordData != null && keywordData.TryGetValue(builtWord, out string? value);
 							CardWord word = new(
 								builtWord,
-								isKeyword && !ignoreFormatting ? new SolidBrush(Color.FromArgb(Convert.ToInt32("ff" + keywordData[isType ? MiscHelper.Capitalize(builtWord.ToLower()) : builtWord], 16))) : defaultBrush,
+								isKeyword && !ignoreFormatting ? new SolidBrush(Color.FromArgb(Convert.ToInt32("ff" + keywordData[builtWord], 16))) : defaultBrush,
 								isKeyword && !ignoreFormatting ? (italicsOpen ? boldItalicFont : boldFont) : italicsOpen ? italicFont : defaultFont
 							);
 							cardWords.Add(word);
@@ -616,13 +610,12 @@ namespace ToonVil_Card_Generator.CardGeneration
 			}
 			if (builtWord != "")
 			{
-				bool isKeyword = keywordData != null && keywordData.TryGetValue(isType ? MiscHelper.Capitalize(builtWord.ToLower()) : builtWord, out string? value);
+				bool isKeyword = keywordData != null && keywordData.TryGetValue(builtWord, out string? value);
 				CardWord word = new(
 					builtWord,
-					isKeyword && !ignoreFormatting ? new SolidBrush(Color.FromArgb(Convert.ToInt32("ff" + keywordData[isType ? MiscHelper.Capitalize(builtWord.ToLower()) : builtWord], 16))) : defaultBrush,
+					isKeyword && !ignoreFormatting ? new SolidBrush(Color.FromArgb(Convert.ToInt32("ff" + keywordData[builtWord], 16))) : defaultBrush,
 					isKeyword && !ignoreFormatting ? (italicsOpen ? boldItalicFont : boldFont) : italicsOpen ? italicFont : defaultFont
 				);
-				word.SetType(isType);
 				cardWords.Add(word);
 			}
 
@@ -849,7 +842,6 @@ namespace ToonVil_Card_Generator.CardGeneration
 			private string text;
 			private Brush textBrush;
 			private Font textFont;
-			private bool isType = false;
 
 			public CardWord()
 			{
@@ -882,12 +874,10 @@ namespace ToonVil_Card_Generator.CardGeneration
 			public string GetText() { return text; }
 			public Brush GetTextBrush() { return textBrush; }
 			public Font GetTextFont() { return textFont; }
-			public bool IsType() { return isType; }
 
 			public void SetText(string text) { this.text = text; }
 			public void SetTextBrush(Brush textBrush) { this.textBrush = textBrush; }
 			public void SetTextFont(Font textFont) { this.textFont = textFont; }
-			public void SetType(bool isType) { this.isType = isType; }
 
 			public SizeF GetSizeF(Graphics drawing, float maxWidth, StringFormat sf)
 			{

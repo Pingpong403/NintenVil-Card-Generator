@@ -2,7 +2,7 @@ using System;
 using System.Net;
 using System.Runtime.CompilerServices;
 
-namespace ToonVil_Card_Generator.CardGeneration
+namespace NintenVil_Card_Generator.CardGeneration
 {
 	public static class KeywordHelper
 	{

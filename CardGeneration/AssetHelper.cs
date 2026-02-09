@@ -1,6 +1,6 @@
 using System;
 
-namespace ToonVil_Card_Generator.CardGeneration
+namespace NintenVil_Card_Generator.CardGeneration
 {
 	public static class AssetHelper
 	{
