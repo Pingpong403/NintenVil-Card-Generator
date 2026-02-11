@@ -94,6 +94,84 @@ namespace NintenVil_Card_Generator.CardGeneration
 		}
 
 		/// <summary>
+		/// Creates an image in TextIntermediary that contains the subtitle.
+		/// </summary>
+		/// <param name="text">subtitle text</param>
+		/// <param name="font">font to draw the subtitle in</param>
+		/// <param name="textColor">color to draw the subtitle in</param>
+		/// <param name="maxWidth">maximum width the subtitle is allowed to take up</param>
+		/// <param name="maxHeight">maximum height the subtitle is allowed to take up</param>
+		public static void DrawSubtitle(string text, Font font, Color textColor, int maxWidth, int maxHeight)
+		{
+			// For subtitles, capitalize the text
+			text = text.ToUpper();
+
+			// Set the stringformat flags for center alignment and no trimming
+			StringFormat sf = StringFormat.GenericTypographic;
+			sf.Trimming = StringTrimming.None;
+			sf.Alignment = StringAlignment.Center;
+			sf.LineAlignment = StringAlignment.Center;
+
+			// Create a new image of the maximum size for our graphics
+			Image img = new Bitmap(maxWidth, maxHeight);
+			Graphics drawing = Graphics.FromImage(img);
+
+			// Use high quality everything
+			drawing.CompositingQuality = CompositingQuality.HighQuality;
+			drawing.InterpolationMode = InterpolationMode.HighQualityBilinear;
+			drawing.PixelOffsetMode = PixelOffsetMode.HighQuality;
+			drawing.SmoothingMode = SmoothingMode.HighQuality;
+			drawing.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
+			
+			// Paint a transparent background
+			drawing.Clear(Color.Transparent);
+
+			// Create a brush for the text
+			Brush textBrush = new SolidBrush(textColor);
+
+			// One line maximum
+			float textHeight = (float)Math.Ceiling(drawing.MeasureString(text, font, 100000, sf).Height);
+
+			// Find the proper squish ratio for given subtitle
+			float textFullWidth = drawing.MeasureString(text, font, 100000, sf).Width;
+			if (textFullWidth > maxWidth)
+			{
+				float horizontalSquish = maxWidth / textFullWidth;
+				drawing.ScaleTransform(horizontalSquish, 1.0F);
+				maxWidth = (int)textFullWidth;
+			}
+
+			// Get all the words
+			List<CardWord> words = GetCardWords(text, textBrush, font, null);
+
+			// Set up variables
+			float startY = (maxHeight - textHeight) / 2;
+
+			// Draw title word by word
+			float currentX = (maxWidth - textFullWidth) / 2;
+			foreach (CardWord word in words)
+			{
+				float wordWidth = word.GetSizeF(drawing, maxWidth, sf).Width;
+				float wordHeight = word.GetSizeF(drawing, maxWidth, sf).Height;
+				drawing.DrawString(word.GetText(), word.GetTextFont(), word.GetTextBrush(), new RectangleF(currentX, startY, wordWidth, wordHeight), sf);
+				currentX += wordWidth;
+			}
+
+			drawing.Save();
+
+			textBrush.Dispose();
+			drawing.Dispose();
+
+			// Ensure output directory exists and save per-element PNG
+			var relativeOutDir = Path.Combine("temp", "TextIntermediary");
+            var outDir = PathHelper.GetFullPath(relativeOutDir);
+			Directory.CreateDirectory(outDir);
+			var outpath = Path.Combine(outDir, "Subtitle.png");
+			img.Save(outpath, ImageFormat.Png);
+			img.Dispose();
+		}
+
+		/// <summary>
 		/// Creates an image in TextIntermediary that contains all of the text/assets needed for an ability.
 		/// </summary>
 		/// <param name="ability">ability of the card</param>
@@ -235,7 +313,7 @@ namespace NintenVil_Card_Generator.CardGeneration
 					{
 						currentY = lineHeight * 0.25F;
 					}
-					DrawSymbol(activateSymbol, drawing, symbolCenterX, currentY + actionSymbolLines * lineHeight / 2, resizing);
+					DrawSymbol(activateSymbol, drawing, textColor, symbolCenterX, currentY + actionSymbolLines * lineHeight / 2, resizing);
 					
 					// Cost, if any
 					if (activateCost != "")
@@ -272,7 +350,7 @@ namespace NintenVil_Card_Generator.CardGeneration
 				{
 					// Symbol
 					symbolCenterX = sideAACenterX - sideAAMaxW / 2 - 100 - activateSymbol.Width * resizing / 2;
-					DrawSymbol(activateSymbol, drawing, symbolCenterX, currentY + activateAbilityHeight / 2, resizing);
+					DrawSymbol(activateSymbol, drawing, textColor, symbolCenterX, currentY + activateAbilityHeight / 2, resizing);
 					
 					// Activate ability
 					words = GetCardWords(activateAbility, textBrush, font, keywordsAndColors);
@@ -303,14 +381,14 @@ namespace NintenVil_Card_Generator.CardGeneration
 				string gainsSymbolPath = PathHelper.GetFullPath(Path.Combine("assets", assetName + ".png"));
 				Image gainsSymbol = Image.FromFile(gainsSymbolPath);
 				float resizing = actionSymbolLines * lineHeight / gainsSymbol.Height;
-				DrawSymbol(gainsSymbol, drawing, maxWidth / 2, currentY + actionSymbolLines * lineHeight / 2, resizing);
+				DrawSymbol(gainsSymbol, drawing, textColor, maxWidth / 2, currentY + actionSymbolLines * lineHeight / 2, resizing);
 
 				// If this was a Gain Power action, draw the amount to be gained
 				if (gainPowerAmt != "")
 				{
 					Font gainPowerFont = FontLoader.GetFont(
 						ConfigHelper.GetConfigValue("text", "elementFont"),
-						float.Parse(ConfigHelper.GetConfigValue("text", "costFontSize")) * resizing
+						float.Parse(ConfigHelper.GetConfigValue("text", "costFontSize")) * lineHeightRatio
 					);
 					PointF gainPowerPos = new(
 						maxWidth / 2,
@@ -698,7 +776,9 @@ namespace NintenVil_Card_Generator.CardGeneration
 			// Set up variables we'll potentially need
 			float dlLines = float.Parse(ConfigHelper.GetConfigValue("asset", "dividingLineLines"));
 			float asLines = float.Parse(ConfigHelper.GetConfigValue("asset", "actionSymbolLines"));
-			Color color = ColorTranslator.FromHtml("#" + ConfigHelper.GetConfigValue("color", "fontColor"));
+			Color color = SettingsHelper.GetSettingsValue("Text", "textColor") == "" ? 
+				ColorTranslator.FromHtml("#" + ConfigHelper.GetConfigValue("color", "fontColor")) :
+				ColorTranslator.FromHtml(SettingsHelper.GetSettingsValue("Text", "textColor"));
 			Brush brush = new SolidBrush(color);
 
 			// Draw text word by word
@@ -786,7 +866,7 @@ namespace NintenVil_Card_Generator.CardGeneration
 					Image asset = Image.FromFile(gainsSymbolPath);
 					float resizing = string.Equals(assetName, "DividingLine") ? 1.0F : asLines * lineH / asset.Height;
 					float yOffset = string.Equals(assetName, "DividingLine") ? dlLines * lineH / 2 : asLines * lineH / 2;
-					DrawSymbol(asset, g, maxW / 2, currentY + yOffset, resizing);
+					DrawSymbol(asset, g, color, maxW / 2, currentY + yOffset, resizing);
 
 					// If this was a Gain Power action, draw the amount to be gained
 					if (gainPowerAmt != "")
@@ -829,9 +909,10 @@ namespace NintenVil_Card_Generator.CardGeneration
 		/// <param name="centerX">the x-coordinate of the center of the symbol</param>
 		/// <param name="centerY">the y-coordinate of the center of the symbol</param>
 		/// <param name="resizing">optional resizing factor</param>
-		private static void DrawSymbol(Image symbol, Graphics g, float centerX, float centerY, float resizing = 1.0F)
+		private static void DrawSymbol(Image symbol, Graphics g, Color color, float centerX, float centerY, float resizing = 1.0F)
 		{
 			Bitmap b = new(symbol, new Size((int)(symbol.Width * resizing), (int)(symbol.Height * resizing)));
+			MiscHelper.ColorSymbol(b, color);
 			float x = centerX - resizing * symbol.Width / 2;
 			float y = centerY - resizing * symbol.Height / 2;
 			g.DrawImage(b, new PointF(x, y));

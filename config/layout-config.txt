@@ -1,5 +1,7 @@
 titleCenterX:720
 titleCenterY:1159
+titleSubtitleOffsetY:-30
+subtitleCenterY:1210
 abilityCenterX:720
 abilityTopY:1294
 typeCenterX:720

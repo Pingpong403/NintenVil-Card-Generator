@@ -6,7 +6,10 @@
 # Title, Cost, Strength, On Play Ability, Activate Ability, Activate Cost Text, Type, Top Right, Bottom Right, Deck Name, Gains Action Symbol
 
 # Fate Deck
-Test Fate		5	This card is a test. It cannot be moved, defeated, discarded, or even looked at.			Hero			Fate	
+Rescued			Move a Hero to any location.			Effect			Fate	
 
 # Villain deck
-Test Villain	17	1	This card is a test. It cannot be used in Vanquish actions or have Power placed on it.			Ally			Villain	
+Mario%Hero of Dinosaur Land		4	Allies and Bowser at Mario's location get -1 Strength.			Hero			Fate	
+Lemmy Koopa	1	2	When an Ally is moved from Lemmy Koopa's location, move Lemmy Koopa to that Ally's location.			Ally			Villain	
+Test Power-Up			This is a Power-Up. I have no idea what they do.			Power-Up			Villain	
+Test System			This is a System. I have no idea what they do.			System			Villain	

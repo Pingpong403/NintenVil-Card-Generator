@@ -19,7 +19,9 @@ class Program
         }
         
         // Setup variables
-        Color textColor = ColorTranslator.FromHtml("#" + ConfigHelper.GetConfigValue("color", "fontColor"));
+        Color textColor = SettingsHelper.GetSettingsValue("Text", "textColor") == "" ? 
+            ColorTranslator.FromHtml("#" + ConfigHelper.GetConfigValue("color", "fontColor")) :
+            ColorTranslator.FromHtml(SettingsHelper.GetSettingsValue("Text", "textColor"));
         int titleAreaMaxWidth = SettingsHelper.GetSettingsValue("Card", "titleMaxWidth") == "" ?
             int.Parse(ConfigHelper.GetConfigValue("card", "textAreaMaxWidth")) :
             int.Parse(SettingsHelper.GetSettingsValue("Card", "titleMaxWidth"));
@@ -36,6 +38,7 @@ class Program
         // Load all the fonts
         string titleFontFile = ConfigHelper.GetConfigValue("text", "titleFont");
         int titleFontSize = int.Parse(ConfigHelper.GetConfigValue("text", "titleFontSize"));
+        int subtitleFontSize = int.Parse(ConfigHelper.GetConfigValue("text", "subtitleFontSize"));
         string abilityFontFile = ConfigHelper.GetConfigValue("text", "abilityFont");
         int abilityFontSize = int.Parse(ConfigHelper.GetConfigValue("text", "abilityFontSize"));
         string elementFontFile = ConfigHelper.GetConfigValue("text", "elementFont");
@@ -46,6 +49,7 @@ class Program
         string typeFontFile = ConfigHelper.GetConfigValue("text", "typeFont");
         int typeFontSize = int.Parse(ConfigHelper.GetConfigValue("text", "typeFontSize"));
         Font titleFont = FontLoader.GetFont(titleFontFile, titleFontSize);
+        Font subtitleFont = FontLoader.GetFont(titleFontFile, subtitleFontSize);
 		Font abilityFont = FontLoader.GetFont(abilityFontFile, abilityFontSize);
         Font typeFont = FontLoader.GetFont(typeFontFile, typeFontSize);
 		Font costFont = FontLoader.GetFont(elementFontFile, costFontSize);
@@ -87,7 +91,18 @@ class Program
                     // Skip cards that do not have all the necessary elements
                     if (title != "" && (ability != "" || activateAbility != "" || activateCost != "" || gainsAction != "") && type != "")
                     {
-                        DrawTitle(title, titleFont, textColor, titleAreaMaxWidth, titleAreaMaxHeight);
+                        if (title.Split("%").Length > 1)
+                        {
+                            string mainTitle = title.Split("%")[0];
+                            string subtitle = title.Split("%")[1];
+                            DrawTitle(mainTitle, titleFont, textColor, titleAreaMaxWidth, titleAreaMaxHeight);
+                            DrawSubtitle(subtitle, subtitleFont, textColor, titleAreaMaxWidth, titleAreaMaxHeight);
+                            title = mainTitle;
+                        }
+                        else
+                        {
+                            DrawTitle(title, titleFont, textColor, titleAreaMaxWidth, titleAreaMaxHeight);
+                        }
                         DrawAbility(ability, activateAbility, activateCost, gainsAction, abilityFont, textColor, abilityAreaMaxWidth, abilityAreaMaxHeight, keywordsAndColors);
                         DrawType(type, typeFont, textColor, typeAreaMaxWidth, typeAreaMaxHeight, keywordsAndColors);
                         if (cost != "") DrawCornerElement(cost, costFont, textColor, "Cost", cornerElementMaxWidth, cornerElementMaxHeight);

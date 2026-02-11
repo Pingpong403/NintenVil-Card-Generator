@@ -73,6 +73,7 @@ namespace NintenVil_Card_Generator.CardGeneration
 			var imagePath = Path.Combine(imageIntermediaryPath, cardTitle + ".png");
 			var altImagePath = Path.Combine(assetsPath, "black_bg.png");
 			var titlePath = Path.Combine(textIntermediaryPath, "Title.png");
+			var subtitlePath = Path.Combine(textIntermediaryPath, "Subtitle.png");
 			var abilityPath = Path.Combine(textIntermediaryPath, "Ability.png");
 			var typePath = Path.Combine(textIntermediaryPath, "Type.png");
 			var costPath = Path.Combine(textIntermediaryPath, "Cost.png");
@@ -122,7 +123,17 @@ namespace NintenVil_Card_Generator.CardGeneration
 			// Title
 			using (Image titleImg = Image.FromFile(titlePath))
 			{
+				bool subtitle = File.Exists(subtitlePath);
 				Point titleCenter = MiscHelper.GetElementPos("title");
+				if (subtitle)
+				{
+					using (Image subtitleImg = Image.FromFile(subtitlePath))
+					{
+						titleCenter.Offset(new Point(0, int.Parse(ConfigHelper.GetConfigValue("layout", "titleSubtitleOffsetY"))));
+						Point subtitleCenter = new Point(int.Parse(ConfigHelper.GetConfigValue("layout", "titleCenterX")), int.Parse(ConfigHelper.GetConfigValue("layout", "subtitleCenterY")));
+						g.DrawImage(subtitleImg, subtitleCenter.X - subtitleImg.Width / 2, subtitleCenter.Y - subtitleImg.Height / 2);
+					}
+				}
 				g.DrawImage(titleImg, titleCenter.X - titleImg.Width / 2, titleCenter.Y - titleImg.Height / 2);
 			}
 			

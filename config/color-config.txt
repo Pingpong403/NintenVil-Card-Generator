@@ -1,6 +1,7 @@
 allyColor:de0022
 itemColor:45afe6
-power-UpColor:19ff23
+effectColor:33b444
+power-upColor:bc6640
 systemColor:91729d
 heroColor:e68c0a
 fontColor:ffffff

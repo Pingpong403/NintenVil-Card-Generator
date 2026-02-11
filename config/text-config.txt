@@ -3,6 +3,7 @@ abilityFont:polygonParty.ttf
 elementFont:polygonParty.ttf
 typeFont:polygonParty.ttf
 titleFontSize:100
+subtitleFontSize:90
 abilityFontSize:80
 abilityMinFontSize:60
 strengthFontSize:110
