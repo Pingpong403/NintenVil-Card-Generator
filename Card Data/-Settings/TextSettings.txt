@@ -6,4 +6,4 @@
 
 # The color of text your Villain uses
 # Accepts: RGB color in hexcode (like #XXXXXX). Default: #ffffff
-textColor:#d42323
+textColor:
