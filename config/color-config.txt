@@ -1,7 +1,8 @@
-allyColor:ff1919
-itemColor:193fff
-effectColor:19ff23
-plotColor:d3568d
-heroColor:eda64b
-fontColor:d7b06c
-ornamentColor:d7b06c
+allyColor:de0022
+itemColor:45afe6
+effectColor:33b444
+power-upColor:bc6640
+systemColor:91729d
+heroColor:e68c0a
+fontColor:ffffff
+ornamentColor:ffffff

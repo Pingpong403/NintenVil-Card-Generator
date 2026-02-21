@@ -6,6 +6,6 @@
 Ally
 Item
 Effect
-Plot
+Power-Up
+System
 Hero
-Tip|ffffff

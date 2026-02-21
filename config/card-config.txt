@@ -1,13 +1,13 @@
 w:1440
 h:2044
-imageAreaHeight:973
-textAreaMaxWidth:1230
+imageAreaHeight:970
+textAreaMaxWidth:1227
 titleAreaMaxHeight:166
-abilityAreaMaxHeight:645
+abilityAreaMaxHeight:635
 activateCostAreaMaxWidth:670
 sideActivateAbilityMaxWidth:750
 sideActivateAbilityCenterX:880
-colonCenterX:580
+colonCenterX:520
 colonPadding:50
 abilityBottomPadding:20
 typeAreaMaxWidth:428

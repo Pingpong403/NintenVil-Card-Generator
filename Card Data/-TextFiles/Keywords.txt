@@ -5,11 +5,9 @@
 # For Villain names with multiple words (e.g. The Hacker), put each word in its own entry. Only the last word needs a possessive version.
 # Format any new keywords like this:
 # [Keyword]|[Keyword plural]|[Keyword possessive]|[Keyword plural possessive]
-Dear
-User|User's
 Ally|Allies|Ally's|Allies'
 Item|Items|Item's|Items'
 Effect|Effects|Effect's|Effects'
-Plot|Plots|Plot's|Plots'
+Power-Up|Power-Ups|Power-Up's|Power-Ups'
+System|Systems|System's|Systems'
 Hero|Heroes|Hero's|Heroes'
-Tip|Tips|Tip's|Tips'
