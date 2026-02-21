@@ -5,11 +5,8 @@
 # Fields in order from left to right (separate each with a TAB):
 # Title, Cost, Strength, On Play Ability, Activate Ability, Activate Cost Text, Type, Top Right, Bottom Right, Deck Name, Gains Action Symbol
 
-# Fate Deck
-Rescued			Move a Hero to any location.			Effect			Fate	
+# Fate deck
+
 
 # Villain deck
 Mario%Hero of Dinosaur Land		4	Allies and Bowser at Mario's location get -1 Strength.			Hero			Fate	
-Lemmy Koopa	1	2	When an Ally is moved from Lemmy Koopa's location, move Lemmy Koopa to that Ally's location.			Ally			Villain	
-Test Power-Up			This is a Power-Up. I have no idea what they do.			Power-Up			Villain	
-Test System			This is a System. I have no idea what they do.			System			Villain	

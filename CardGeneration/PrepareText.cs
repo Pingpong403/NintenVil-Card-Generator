@@ -189,9 +189,9 @@ namespace NintenVil_Card_Generator.CardGeneration
 			float granularity = float.Parse(ConfigHelper.GetConfigValue("text", "fontDecreaseGranularity"));
 			float paddingLines = float.Parse(ConfigHelper.GetConfigValue("text", "abilityPaddingLines"));
 			float minFontSize = float.Parse(ConfigHelper.GetConfigValue("text", "abilityMinFontSize"));
-			float dividingLineLines = float.Parse(ConfigHelper.GetConfigValue("asset", "dividingLineLines"));
 			float actionSymbolLines = float.Parse(ConfigHelper.GetConfigValue("asset", "actionSymbolLines"));
 			float lineSpacing = float.Parse(ConfigHelper.GetConfigValue("text", "lineSpacingFactor"));
+			float aaPaddingLines = float.Parse(ConfigHelper.GetConfigValue("text", "activateAbilityPaddingLines"));
 			int abilityBottomPadding = int.Parse(ConfigHelper.GetConfigValue("card", "abilityBottomPadding"));
 			int sideAAMaxW = int.Parse(ConfigHelper.GetConfigValue("card", "sideActivateAbilityMaxWidth"));
 			int sideAACenterX = int.Parse(ConfigHelper.GetConfigValue("card", "sideActivateAbilityCenterX"));
@@ -230,10 +230,12 @@ namespace NintenVil_Card_Generator.CardGeneration
 			float gainsActionHeight;
 			float paddingHeight;
 			float textHeight;
+			int aaPadding;
 			do
 			{
 				// Combine every given ability into one metric
 				lineHeight = drawing.MeasureString("Tq", font, maxWidth, sf).Height * lineSpacing;
+				aaPadding = (int)(lineHeight * aaPaddingLines);
 				abilityHeight = ability == "" ? 0 : MeasureWordByWord(GetCardWords(ability, textBrush, font, keywordsAndColors), drawing, sf, maxWidth, lineHeight);
 				activateAbilityHeight = 0;
 				if (activateAbility != "" || activateCost != "")
@@ -241,6 +243,7 @@ namespace NintenVil_Card_Generator.CardGeneration
 					if (ability == "" || activateCost != "") // If there is no ability or there is an activate cost, measure normally
 					{
 						activateAbilityHeight += actionSymbolLines * lineHeight + MeasureWordByWord(GetCardWords(activateAbility, textBrush, font, keywordsAndColors), drawing, sf, maxWidth, lineHeight);
+						activateAbilityHeight += aaPadding;
 					}
 					else
 					{
@@ -337,7 +340,7 @@ namespace NintenVil_Card_Generator.CardGeneration
 							DrawWordByWord(words, drawing, sf, activateCostWidth, lineHeight, maxWidth / 2 + costCenterX, activateCostY);
 						}
 					}
-					currentY += actionSymbolLines * lineHeight;
+					currentY += actionSymbolLines * lineHeight + aaPadding;
 
 					// Ability, if any
 					if (activateAbility != "")
@@ -711,12 +714,14 @@ namespace NintenVil_Card_Generator.CardGeneration
 		/// <returns>the vertical space needed by these words</returns>
 		public static float MeasureWordByWord(List<CardWord> words, Graphics g, StringFormat sf, float maxW, float lineHeight)
 		{
+			float lineBreakLines = float.Parse(ConfigHelper.GetConfigValue("text", "lineBreakLines"));
 			float actionSymbolLines = float.Parse(ConfigHelper.GetConfigValue("asset", "actionSymbolLines"));
 			float dividingLineLines = float.Parse(ConfigHelper.GetConfigValue("asset", "dividingLineLines"));
 
 			float textHeight = 0;
 			float lineWidth = 0;
 			bool space = false;
+			bool shrinkLineBreak = false;
 			float spaceWidth = 0;
 			foreach (CardWord word in words)
 			{
@@ -741,7 +746,8 @@ namespace NintenVil_Card_Generator.CardGeneration
 				// Newlines: add a line
 				else if (word.GetText() == "\n")
 				{
-					textHeight += lineHeight;
+					textHeight += lineHeight * (shrinkLineBreak ? lineBreakLines : 1.0F);
+					shrinkLineBreak = !shrinkLineBreak;
 					lineWidth = 0.001F; // Completely ignore the text that was already built up
 				}
 				// Generic case: add word's width (+ space), check if over
@@ -755,6 +761,7 @@ namespace NintenVil_Card_Generator.CardGeneration
 					}
 					space = false;
 				}
+				if (word.GetText() != "\n") shrinkLineBreak = false;
 			}
 			if (lineWidth > 0) textHeight += lineHeight;
 			return textHeight;
@@ -774,6 +781,7 @@ namespace NintenVil_Card_Generator.CardGeneration
 		private static float DrawWordByWord(List<CardWord> words, Graphics g, StringFormat sf, float maxW, float lineH, float centerX, float startY)
 		{
 			// Set up variables we'll potentially need
+			float brLines = float.Parse(ConfigHelper.GetConfigValue("text", "lineBreakLines"));
 			float dlLines = float.Parse(ConfigHelper.GetConfigValue("asset", "dividingLineLines"));
 			float asLines = float.Parse(ConfigHelper.GetConfigValue("asset", "actionSymbolLines"));
 			Color color = SettingsHelper.GetSettingsValue("Text", "textColor") == "" ? 
@@ -786,6 +794,7 @@ namespace NintenVil_Card_Generator.CardGeneration
 			int iCheck = 0;
 			int iDraw = 0;
 			float lineLength;
+			bool shrinkLineBreak = false;
 			bool drawAsset = false;
 			bool endOfText = false;
 			while (!endOfText)
@@ -817,6 +826,7 @@ namespace NintenVil_Card_Generator.CardGeneration
 						}
 						else if (words[iCheck].GetText() == "\n")
 						{
+							if (words[iCheck + 1].GetText() == "\n") shrinkLineBreak = true;
 							endOfLine = true;
 							iCheck++;
 						}
@@ -853,6 +863,13 @@ namespace NintenVil_Card_Generator.CardGeneration
 				}
 				// Move the register down
 				currentY += lineH;
+				if (shrinkLineBreak)
+				{
+					currentY += brLines * lineH;
+					iCheck++;
+					iDraw++;
+					shrinkLineBreak = false;
+				}
 				// Draw the asset that is up to draw
 				if (drawAsset)
 				{

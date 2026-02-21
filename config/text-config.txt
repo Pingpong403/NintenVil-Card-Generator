@@ -11,9 +11,11 @@ costFontSize:110
 topRightFontSize:110
 bottomRightFontSize:110
 typeFontSize:70
+lineBreakLines:0.7
 fontDecreaseGranularity:0.4
 lineSpacingFactor:0.9
 abilityPaddingLines:0.5
+activateAbilityPaddingLines:0.6
 spaceShrink:0.7
 italicCharacter:*
 escapeCharacter:\
